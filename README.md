@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License">
+
   <img src="screenshots/statusbar-normal.png" alt="正常模式" width="600">
 </p>
 
@@ -262,7 +262,7 @@ rm -f ~/.claude/statusline.sh ~/.claude/statusline-config.sh ~/.claude/statuslin
 
 ---
 
-## 📄 许可证
+## 📄 许可证  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License">  
 
 本项目基于 MIT 许可证开源，详情见 [LICENSE](LICENSE) 文件。
 
