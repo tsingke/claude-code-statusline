@@ -21,8 +21,8 @@
 
 | Normal Mode | Context Warning | Agent Mode |
 |:---:|:---:|:---:|
-| ![Normal](screenshots/statusbar-closeup.png) | ![Warning](screenshots/statusbar-closeup.png) | ![Agent](screenshots/statusbar-closeup.png) |
-| Healthy context usage (< 50%) | Elevated usage (50-80%) | Agent subprocess active |
+| ![Normal](screenshots/statusbar-normal.png) | ![Warning](screenshots/statusbar-warning.png) | ![Agent](screenshots/statusbar-agent.png) |
+| Healthy context (< 50%) | Elevated usage (50-80%) | Context danger (> 80%) |
 
 ![Full Interface](screenshots/statusbar-simulator.png)
 

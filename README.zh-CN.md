@@ -19,10 +19,10 @@
 
 ## 📸 效果预览
 
-| 正常模式 | 上下文预警 | Agent 模式 |
+| 正常模式 | 上下文偏高 | 上下文预警 |
 |:---:|:---:|:---:|
-| ![正常](screenshots/statusbar-closeup.png) | ![预警](screenshots/statusbar-closeup.png) | ![Agent](screenshots/statusbar-closeup.png) |
-| 上下文健康 (< 50%) | 上下文偏高 (50-80%) | Agent 子进程运行中 |
+| ![正常](screenshots/statusbar-normal.png) | ![偏高](screenshots/statusbar-warning.png) | ![预警](screenshots/statusbar-agent.png) |
+| 上下文健康 (< 50%) | 较高占用 (50-80%) | 危险占用 (> 80%) |
 
 ![完整界面](screenshots/statusbar-simulator.png)
 
