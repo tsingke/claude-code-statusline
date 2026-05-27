@@ -74,6 +74,10 @@
 
 内置 5 套配色主题，一键切换，满足不同终端审美：
 
+<p align="center">
+  <img src="screenshots/themes-preview.svg" alt="5 种主题配色预览" width="820">
+</p>
+
 | 主题 | 风格 | 模型色 | 目录色 |
 |------|------|--------|--------|
 | **default** | 原版配色（品红/蓝/绿） | 🔮 品红 | 🔵 蓝 |
@@ -231,6 +235,7 @@ claude-code-statusline/
 │   ├── install.sh                # 自动安装脚本
 │   └── uninstall.sh              # 自动卸载脚本
 └── screenshots/
+    ├── themes-preview.svg        # 5 套主题配色可视化对比
     ├── statusbar-simulator.png   # 完整界面截图
     ├── statusbar-closeup.png     # 状态栏特写
     ├── statusbar-normal.png      # 正常模式

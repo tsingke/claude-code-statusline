@@ -75,6 +75,10 @@
 
 Switch between 5 built-in color themes:
 
+<p align="center">
+  <img src="screenshots/themes-preview.svg" alt="5 theme color comparison" width="820">
+</p>
+
 | Theme | Style | Model Color | Dir Color |
 |-------|-------|-------------|-----------|
 | **default** | Original (magenta/blue/green) | 🔮 Magenta | 🔵 Blue |

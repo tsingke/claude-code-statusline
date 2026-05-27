@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="620" viewBox="0 0 860 620">
+  <style>
+    text { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+    .title { font-size: 18px; font-weight: bold; fill: #e0e0e0; }
+    .label { font-size: 14px; font-weight: bold; }
+    .desc { font-size: 11px; fill: #888; }
+    .sep { fill: #555; }
+    .legend-label { font-size: 10px; fill: #aaa; }
+  </style>
+  <rect width="860" height="620" rx="12" fill="#1a1b26"/>
+
+  <!-- Title -->
+  <text x="30" y="40" class="title">Claude Code Statusline — 5 种主题配色预览</text>
+  <text x="30" y="58" class="desc">深色终端背景下的视觉效果对比</text>
+
+  <!-- ===== Theme 1: default ===== -->
+  <rect x="20" y="75" width="820" height="90" rx="8" fill="#12131e"/>
+  <rect x="20" y="75" width="820" height="34" rx="8" fill="none" stroke="#2a2b3e" stroke-width="1"/>
+  <rect x="20" y="109" width="820" height="0" fill="none" stroke="#2a2b3e" stroke-width="1"/>
+  <text x="30" y="97" class="label" fill="#cd00cd">default</text>
+  <text x="130" y="97" class="desc">Original — 品红 model / 蓝色 dir / 三色上下文</text>
+
+  <!-- Status bar line -->
+  <text x="30" y="138" font-size="13" font-weight="bold" fill="#cd00cd">DeepSeek-V4-flash</text>
+  <text x="210" y="138" class="sep">|</text>
+  <text x="222" y="138" font-size="13" fill="#0000ee">Workspace/projects</text>
+  <text x="390" y="138" class="sep">|</text>
+  <text x="402" y="138" font-size="13" fill="#00cd00">43% (86k/200k)</text>
+  <text x="540" y="138" class="sep">|</text>
+  <text x="552" y="138" font-size="13" fill="#666" font-style="italic">think</text>
+  <text x="600" y="138" class="sep">|</text>
+  <text x="612" y="138" font-size="13" fill="#00cdcd">high</text>
+
+  <!-- Swatches -->
+  <rect x="30" y="150" width="10" height="10" rx="2" fill="#cd00cd"/>
+  <text x="44" y="159" class="legend-label">Model</text>
+  <rect x="90" y="150" width="10" height="10" rx="2" fill="#0000ee"/>
+  <text x="104" y="159" class="legend-label">Dir</text>
+  <rect x="140" y="150" width="10" height="10" rx="2" fill="#00cd00"/>
+  <text x="154" y="159" class="legend-label">Context&lt;50</text>
+  <rect x="220" y="150" width="10" height="10" rx="2" fill="#cdcd00"/>
+  <text x="234" y="159" class="legend-label">50-80</text>
+  <rect x="280" y="150" width="10" height="10" rx="2" fill="#ff0000"/>
+  <text x="294" y="159" class="legend-label">&gt;80</text>
+  <rect x="330" y="150" width="10" height="10" rx="2" fill="#666"/>
+  <text x="344" y="159" class="legend-label">Think</text>
+  <rect x="390" y="150" width="10" height="10" rx="2" fill="#00cdcd"/>
+  <text x="404" y="159" class="legend-label">Effort</text>
+
+  <!-- ===== Theme 2: ocean ===== -->
+  <rect x="20" y="180" width="820" height="90" rx="8" fill="#0e1a2b"/>
+  <rect x="20" y="180" width="820" height="34" rx="8" fill="none" stroke="#1a3050" stroke-width="1"/>
+  <text x="30" y="202" class="label" fill="#00ced1">ocean</text>
+  <text x="130" y="202" class="desc">冷色系青蓝调 — Cool blue/cyan tones</text>
+
+  <text x="30" y="243" font-size="13" font-weight="bold" fill="#00ced1">DeepSeek-V4-flash</text>
+  <text x="210" y="243" class="sep">|</text>
+  <text x="222" y="243" font-size="13" fill="#4488ff">Workspace/projects</text>
+  <text x="390" y="243" class="sep">|</text>
+  <text x="402" y="243" font-size="13" fill="#00cd00">43% (86k/200k)</text>
+  <text x="540" y="243" class="sep">|</text>
+  <text x="552" y="243" font-size="13" fill="#88bbdd" font-style="italic">think</text>
+  <text x="600" y="243" class="sep">|</text>
+  <text x="612" y="243" font-size="13" fill="#00ced1">high</text>
+
+  <rect x="30" y="255" width="10" height="10" rx="2" fill="#00ced1"/>
+  <text x="44" y="264" class="legend-label">Model</text>
+  <rect x="90" y="255" width="10" height="10" rx="2" fill="#4488ff"/>
+  <text x="104" y="264" class="legend-label">Dir</text>
+  <rect x="140" y="255" width="10" height="10" rx="2" fill="#00cd00"/>
+  <text x="154" y="264" class="legend-label">Context&lt;50</text>
+  <rect x="220" y="255" width="10" height="10" rx="2" fill="#cdcd00"/>
+  <text x="234" y="264" class="legend-label">50-80</text>
+  <rect x="280" y="255" width="10" height="10" rx="2" fill="#ff0000"/>
+  <text x="294" y="264" class="legend-label">&gt;80</text>
+  <rect x="330" y="255" width="10" height="10" rx="2" fill="#88bbdd"/>
+  <text x="344" y="264" class="legend-label">Think</text>
+  <rect x="390" y="255" width="10" height="10" rx="2" fill="#00ced1"/>
+  <text x="404" y="264" class="legend-label">Effort</text>
+
+  <!-- ===== Theme 3: monokai ===== -->
+  <rect x="20" y="285" width="820" height="90" rx="8" fill="#272822"/>
+  <rect x="20" y="285" width="820" height="34" rx="8" fill="none" stroke="#3e3d32" stroke-width="1"/>
+  <text x="30" y="307" class="label" fill="#e6db74">monokai</text>
+  <text x="130" y="307" class="desc">Monokai 暖色调 — Yellow model / cyan dir / magenta effort</text>
+
+  <text x="30" y="348" font-size="13" font-weight="bold" fill="#e6db74">DeepSeek-V4-flash</text>
+  <text x="210" y="348" class="sep">|</text>
+  <text x="222" y="348" font-size="13" fill="#66d9ef">Workspace/projects</text>
+  <text x="390" y="348" class="sep">|</text>
+  <text x="402" y="348" font-size="13" fill="#a6e22e">43% (86k/200k)</text>
+  <text x="540" y="348" class="sep">|</text>
+  <text x="552" y="348" font-size="13" fill="#888" font-style="italic">think</text>
+  <text x="600" y="348" class="sep">|</text>
+  <text x="612" y="348" font-size="13" fill="#fd5ff0">high</text>
+
+  <rect x="30" y="360" width="10" height="10" rx="2" fill="#e6db74"/>
+  <text x="44" y="369" class="legend-label">Model</text>
+  <rect x="90" y="360" width="10" height="10" rx="2" fill="#66d9ef"/>
+  <text x="104" y="369" class="legend-label">Dir</text>
+  <rect x="140" y="360" width="10" height="10" rx="2" fill="#a6e22e"/>
+  <text x="154" y="369" class="legend-label">Context&lt;50</text>
+  <rect x="220" y="360" width="10" height="10" rx="2" fill="#e6db74"/>
+  <text x="234" y="369" class="legend-label">50-80</text>
+  <rect x="280" y="360" width="10" height="10" rx="2" fill="#f92672"/>
+  <text x="294" y="369" class="legend-label">&gt;80</text>
+  <rect x="330" y="360" width="10" height="10" rx="2" fill="#888"/>
+  <text x="344" y="369" class="legend-label">Think</text>
+  <rect x="390" y="360" width="10" height="10" rx="2" fill="#fd5ff0"/>
+  <text x="404" y="369" class="legend-label">Effort</text>
+
+  <!-- ===== Theme 4: minimal ===== -->
+  <rect x="20" y="390" width="820" height="90" rx="8" fill="#1c1c1e"/>
+  <rect x="20" y="390" width="820" height="34" rx="8" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="30" y="412" class="label" fill="#e5e5e5">minimal</text>
+  <text x="130" y="412" class="desc">低对比度简洁风 — Low contrast, clean and unobtrusive</text>
+
+  <text x="30" y="453" font-size="13" font-weight="bold" fill="#ffffff">DeepSeek-V4-flash</text>
+  <text x="210" y="453" class="sep">|</text>
+  <text x="222" y="453" font-size="13" fill="#cccccc">Workspace/projects</text>
+  <text x="390" y="453" class="sep">|</text>
+  <text x="402" y="453" font-size="13" fill="#66ff66">43% (86k/200k)</text>
+  <text x="540" y="453" class="sep">|</text>
+  <text x="552" y="453" font-size="13" fill="#999" font-style="italic">think</text>
+  <text x="600" y="453" class="sep">|</text>
+  <text x="612" y="453" font-size="13" fill="#cccccc">high</text>
+
+  <rect x="30" y="465" width="10" height="10" rx="2" fill="#ffffff"/>
+  <text x="44" y="474" class="legend-label">Model</text>
+  <rect x="90" y="465" width="10" height="10" rx="2" fill="#cccccc"/>
+  <text x="104" y="474" class="legend-label">Dir</text>
+  <rect x="140" y="465" width="10" height="10" rx="2" fill="#66ff66"/>
+  <text x="154" y="474" class="legend-label">Context&lt;50</text>
+  <rect x="220" y="465" width="10" height="10" rx="2" fill="#ffff66"/>
+  <text x="234" y="474" class="legend-label">50-80</text>
+  <rect x="280" y="465" width="10" height="10" rx="2" fill="#ff6666"/>
+  <text x="294" y="474" class="legend-label">&gt;80</text>
+  <rect x="330" y="465" width="10" height="10" rx="2" fill="#999"/>
+  <text x="344" y="474" class="legend-label">Think</text>
+  <rect x="390" y="465" width="10" height="10" rx="2" fill="#cccccc"/>
+  <text x="404" y="474" class="legend-label">Effort</text>
+
+  <!-- ===== Theme 5: neon ===== -->
+  <rect x="20" y="495" width="820" height="90" rx="8" fill="#0a0a14"/>
+  <rect x="20" y="495" width="820" height="34" rx="8" fill="none" stroke="#2a1a3e" stroke-width="1"/>
+  <text x="30" y="517" class="label" fill="#ff00ff">neon</text>
+  <text x="130" y="517" class="desc">霓虹亮色 — Bright neon for dark terminals</text>
+
+  <text x="30" y="558" font-size="13" font-weight="bold" fill="#ff00ff">DeepSeek-V4-flash</text>
+  <text x="210" y="558" class="sep">|</text>
+  <text x="222" y="558" font-size="13" fill="#00ffff">Workspace/projects</text>
+  <text x="390" y="558" class="sep">|</text>
+  <text x="402" y="558" font-size="13" fill="#00ff00">43% (86k/200k)</text>
+  <text x="540" y="558" class="sep">|</text>
+  <text x="552" y="558" font-size="13" fill="#ff66cc" font-style="italic">think</text>
+  <text x="600" y="558" class="sep">|</text>
+  <text x="612" y="558" font-size="13" fill="#00ffff">high</text>
+
+  <rect x="30" y="570" width="10" height="10" rx="2" fill="#ff00ff"/>
+  <text x="44" y="579" class="legend-label">Model</text>
+  <rect x="90" y="570" width="10" height="10" rx="2" fill="#00ffff"/>
+  <text x="104" y="579" class="legend-label">Dir</text>
+  <rect x="140" y="570" width="10" height="10" rx="2" fill="#00ff00"/>
+  <text x="154" y="579" class="legend-label">Context&lt;50</text>
+  <rect x="220" y="570" width="10" height="10" rx="2" fill="#ffff00"/>
+  <text x="234" y="579" class="legend-label">50-80</text>
+  <rect x="280" y="570" width="10" height="10" rx="2" fill="#ff0000"/>
+  <text x="294" y="579" class="legend-label">&gt;80</text>
+  <rect x="330" y="570" width="10" height="10" rx="2" fill="#ff66cc"/>
+  <text x="344" y="579" class="legend-label">Think</text>
+  <rect x="390" y="570" width="10" height="10" rx="2" fill="#00ffff"/>
+  <text x="404" y="579" class="legend-label">Effort</text>
+</svg>
