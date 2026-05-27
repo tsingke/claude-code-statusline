@@ -1,84 +1,158 @@
 #!/bin/bash
 # =============================================================================
-# Claude Code Status Line
-# A real-time status bar for Claude Code that displays model, working directory,
-# context usage, thinking mode, and effort level at the bottom of your terminal.
-#
-# Installation:  ./scripts/install.sh
-# Uninstallation: ./scripts/uninstall.sh
+# Claude Code Status Line v2
+# A real-time status bar for Claude Code with multi-theme support.
+# Reads session state from stdin (JSON payload from Claude Code) and outputs
+# a formatted status line to stdout, displayed at the terminal bottom.
 # =============================================================================
-
 set -euo pipefail
 
-# Read the JSON payload from Claude Code (passed via stdin)
-read -r input
+CONFIG_FILE="$HOME/.claude/statusline-config.json"
 
-# --- Extract fields ---
-model=$(echo "$input"   | jq -r '.model.display_name // "?"')
-cwd=$(echo "$input"     | jq -r '.workspace.current_dir // .cwd // ""')
-agent=$(echo "$input"   | jq -r '.agent.name // ""')
-ctx=$(echo "$input"     | jq -r '.context_window.used_percentage // ""')
-effort=$(echo "$input"  | jq -r '.effort.level // ""')
-tokens=$(echo "$input"  | jq -r '.context_window.total_input_tokens // ""')
-maxtok=$(echo "$input"  | jq -r '.context_window.context_window_size // ""')
-thin=$(echo "$input"    | jq -r '.thinking.enabled // false')
+# --- Load config (with fallback) ---
+config=$(cat "$CONFIG_FILE" 2>/dev/null) || config='{"theme":"default","separator":"|","show":["model","dir","context","think","effort","agent"]}'
 
-# --- Shorten working directory ---
-# Replace $HOME with ~, then keep only the last two path components
-short_cwd=$(echo "$cwd" | sed "s|^$HOME|~|" | awk -F/ '{n=NF; if(n>2) print $(n-1)"/"$n; else print}')
+CURRENT_THEME=$(echo "$config" | jq -r '.theme // "default"')
+SEPARATOR_CHAR=$(echo "$config" | jq -r '.separator // "|"')
 
-# --- ANSI color codes ---
-BOLD='\033[1m'
-DIM='\033[2m'
-BLUE='\033[34m'
-CYAN='\033[36m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-MAGENTA='\033[35m'
-RED='\033[91m'
-RESET='\033[0m'
-SEP=" ${DIM}|${RESET} "
+# --- Check field visibility ---
+field_visible() {
+  echo "$config" | jq -e --arg f "$1" '.show // ["model","dir","context","think","effort","agent"] | index($f)' > /dev/null 2>&1
+}
 
-# --- Build the status line ---
-line="${BOLD}${MAGENTA}${model}${RESET}"
+# --- Theme definitions (SGR color codes) ---
+case "$CURRENT_THEME" in
+  ocean)
+    C_MODEL="1;36"; C_DIR="34"; C_AGENT="33"
+    C_GREEN="32"; C_YELLOW="33"; C_RED="91"
+    C_THINK="2;3"; C_EFFORT="36"; SEP_DIM="2"
+    ;;
+  monokai)
+    C_MODEL="1;33"; C_DIR="36"; C_AGENT="31"
+    C_GREEN="32"; C_YELLOW="93"; C_RED="91"
+    C_THINK="2;3"; C_EFFORT="35"; SEP_DIM="2"
+    ;;
+  minimal)
+    C_MODEL="1;37"; C_DIR="37"; C_AGENT="37"
+    C_GREEN="92"; C_YELLOW="93"; C_RED="91"
+    C_THINK="2;37"; C_EFFORT="37"; SEP_DIM="2"
+    ;;
+  neon)
+    C_MODEL="1;35"; C_DIR="36"; C_AGENT="93"
+    C_GREEN="92"; C_YELLOW="93"; C_RED="91"
+    C_THINK="2;35"; C_EFFORT="96"; SEP_DIM="2"
+    ;;
+  *) # default (original style)
+    C_MODEL="1;35"; C_DIR="34"; C_AGENT="33"
+    C_GREEN="32"; C_YELLOW="33"; C_RED="91"
+    C_THINK="2;3"; C_EFFORT="36"; SEP_DIM="2"
+    ;;
+esac
 
-# Working directory (blue)
-if [ -n "$short_cwd" ]; then
-  line+="${SEP}${BLUE}${short_cwd}${RESET}"
+RESET="\033[0m"
+SEP="\033[${SEP_DIM}m${SEPARATOR_CHAR}\033[0m"
+
+# --- Read stdin (the JSON payload from Claude Code) ---
+# Use || true to avoid set -e exit when stdin is empty (e.g. session startup)
+read -r input || input="{}"
+
+# --- Single jq call: extract all fields at once ---
+eval "$(echo "$input" | jq -r '
+  {
+    model:    (.model.display_name // "?"),
+    cwd:      (.workspace.current_dir // .cwd // ""),
+    agent:    (.agent.name // ""),
+    ctx:      (.context_window.used_percentage // ""),
+    effort:   (.effort.level // ""),
+    tokens:   (.context_window.total_input_tokens // ""),
+    maxtok:   (.context_window.context_window_size // ""),
+    thin:     (.thinking.enabled // false),
+    fast:     (.fast_mode // false),
+    duration: (.cost.total_duration_ms // "")
+  } | to_entries[] | "\(.key)=\(.value | @sh)"
+')" 2>/dev/null || true
+
+# --- Shorten working directory: ~/.../last-two-levels ---
+short_cwd=""
+if [ -n "$cwd" ]; then
+  short_cwd=$(echo "$cwd" | sed "s|^$HOME|~|" | awk -F/ '{n=NF; if(n>2) print $(n-1)"/"$n; else print}')
 fi
 
-# Agent name (yellow)
-if [ -n "$agent" ]; then
-  line+="${SEP}${YELLOW}${agent}${RESET}"
+# --- Format session duration ---
+duration_str=""
+if [ -n "$duration" ]; then
+  seconds=$(awk "BEGIN {printf \"%.0f\", $duration/1000}" 2>/dev/null || echo "0")
+  if [ "$seconds" -ge 60 ]; then
+    minutes=$((seconds / 60))
+    secs=$((seconds % 60))
+    duration_str="${minutes}m${secs}s"
+  elif [ "$seconds" -gt 0 ]; then
+    duration_str="${seconds}s"
+  fi
 fi
 
-# Context usage (green/yellow/red depending on usage level)
-if [ -n "$ctx" ]; then
+# --- Build status line ---
+line=""
+
+# Model
+if field_visible "model"; then
+  line="\033[${C_MODEL}m${model}\033[0m"
+fi
+
+# Working directory
+if field_visible "dir" && [ -n "$short_cwd" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_DIR}m${short_cwd}\033[0m"
+fi
+
+# Agent name
+if field_visible "agent" && [ -n "$agent" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_AGENT}m${agent}\033[0m"
+fi
+
+# Context usage with color thresholds (<50% green / 50-80% yellow / >80% red)
+if field_visible "context" && [ -n "$ctx" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
   ctx_int=${ctx%.*}
   if [ "$ctx_int" -gt 80 ] 2>/dev/null; then
-    ctx_color="$RED"
+    C_CTX="$C_RED"
   elif [ "$ctx_int" -gt 50 ] 2>/dev/null; then
-    ctx_color="$YELLOW"
+    C_CTX="$C_YELLOW"
   else
-    ctx_color="$GREEN"
+    C_CTX="$C_GREEN"
   fi
-  line+="${SEP}${ctx_color}${ctx}%"
+  line+="\033[${C_CTX}m${ctx}%"
   if [ -n "$tokens" ] && [ -n "$maxtok" ] && [ "$maxtok" != "0" ]; then
     used_k=$(awk "BEGIN {printf \"%.0f\", $tokens/1000}")
     max_k=$(awk "BEGIN {printf \"%.0f\", $maxtok/1000}")
     line+=" (${used_k}k/${max_k}k)"
   fi
-  line+="${RESET}"
+  line+="\033[0m"
 fi
 
-# Thinking mode indicator (dim italic)
-if [ "$thin" = "true" ]; then
-  line+="${SEP}${DIM}think${RESET}"
+# Thinking mode indicator
+if field_visible "think" && [ "$thin" = "true" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_THINK}mthink\033[0m"
 fi
 
-# Effort level (cyan)
-if [ -n "$effort" ]; then
-  line+="${SEP}${CYAN}${effort}${RESET}"
+# Fast mode indicator
+if field_visible "fast" && [ "$fast" = "true" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_EFFORT}mfast\033[0m"
+fi
+
+# Session duration
+if field_visible "duration" && [ -n "$duration_str" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_EFFORT}m${duration_str}\033[0m"
+fi
+
+# Effort level
+if field_visible "effort" && [ -n "$effort" ]; then
+  [ -n "$line" ] && line+=" ${SEP} "
+  line+="\033[${C_EFFORT}m${effort}\033[0m"
 fi
 
 echo -e "$line"

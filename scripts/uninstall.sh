@@ -4,21 +4,33 @@
 # =============================================================================
 set -euo pipefail
 
-SCRIPT_DST="$HOME/.claude/statusline.sh"
-SETTINGS="$HOME/.claude/settings.json"
+CLAUDE_DIR="$HOME/.claude"
+DST_SCRIPT="$CLAUDE_DIR/statusline.sh"
+DST_CONFIG="$CLAUDE_DIR/statusline-config.sh"
+CONFIG_FILE="$CLAUDE_DIR/statusline-config.json"
+SETTINGS="$CLAUDE_DIR/settings.json"
+SKILL_DIR="$CLAUDE_DIR/skills/claude-statusline"
 
-echo "🗑️  Claude Code Status Line Uninstaller"
-echo "========================================"
+echo "============================================"
+echo " Claude Code Status Line Uninstaller"
+echo "============================================"
+echo ""
 
-# Remove script
-if [ -f "$SCRIPT_DST" ]; then
-  rm "$SCRIPT_DST"
-  echo "✅ Removed $SCRIPT_DST"
-else
-  echo "ℹ️  Script not found, skipping"
+# Remove scripts
+for f in "$DST_SCRIPT" "$DST_CONFIG" "$CONFIG_FILE"; do
+  if [ -f "$f" ]; then
+    rm "$f"
+    echo "✅ Removed: $f"
+  fi
+done
+
+# Remove skill
+if [ -d "$SKILL_DIR" ]; then
+  rm -rf "$SKILL_DIR"
+  echo "✅ Removed skilL: $SKILL_DIR"
 fi
 
-# Remove config from settings.json
+# Remove statusLine entry from settings.json
 if [ -f "$SETTINGS" ]; then
   python3 -c "
 import json, os
@@ -33,8 +45,8 @@ if 'statusLine' in cfg:
     print('✅ statusLine removed from settings.json')
 else:
     print('ℹ️  statusLine not found in settings.json')
-"
+  "
 fi
 
 echo ""
-echo "✅ Uninstallation complete. Restart Claude Code to apply."
+echo "✅ Uninstall complete. Restart Claude Code to apply."
