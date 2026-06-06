@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Status Line — 实时终端状态栏</title>
+  <meta name="description" content="为 Claude Code 打造的情境感知状态栏——模型、目录、上下文、推理模式，一眼尽览。支持10套主题与字段自定义。">
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-card: #1c2333;
+      --border: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent-magenta: #f778ba;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-yellow: #d29922;
+      --accent-red: #f85149;
+      --accent-cyan: #39d2c0;
+      --accent-purple: #bc8cff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* Nav */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+    }
+    nav .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent-magenta); }
+    nav .lang-switch a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+    nav .lang-switch a:hover { color: var(--accent-blue); }
+
+    /* Hero */
+    .hero {
+      text-align: center; padding: 60px 0 40px;
+    }
+    .hero h1 {
+      font-size: 2.6rem; font-weight: 800; margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--accent-magenta), var(--accent-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 24px; }
+    .hero .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+    .badge {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .badge-mit { background: #1c2333; color: var(--text-secondary); border: 1px solid var(--border); }
+    .badge-version { background: rgba(57, 210, 192, 0.15); color: var(--accent-cyan); border: 1px solid rgba(57, 210, 192, 0.3); }
+
+    .demo-bar {
+      margin: 32px auto 0; max-width: 700px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 20px; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85rem; white-space: nowrap; overflow-x: auto;
+    }
+    .demo-bar .model { color: var(--accent-magenta); font-weight: 700; }
+    .demo-bar .sep { color: var(--text-secondary); }
+    .demo-bar .dir { color: var(--accent-blue); }
+    .demo-bar .ctx { color: var(--accent-green); }
+    .demo-bar .think { color: var(--text-secondary); font-style: italic; }
+    .demo-bar .effort { color: var(--accent-cyan); }
+
+    /* Section */
+    section { padding: 48px 0; }
+    section h2 {
+      font-size: 1.5rem; font-weight: 700; margin-bottom: 24px;
+      color: var(--text-primary);
+    }
+    section h2 .emoji { margin-right: 8px; }
+
+    /* Features */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px; transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--accent-blue); }
+    .feature-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .feature-card h3 { font-size: 1rem; margin-bottom: 6px; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-secondary); }
+
+    /* Themes */
+    .themes-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .theme-swatch {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px; text-align: center;
+    }
+    .theme-swatch .name { font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+    .theme-bar {
+      height: 24px; border-radius: 4px; display: flex; overflow: hidden;
+    }
+    .theme-bar span { flex: 1; }
+
+    .theme-default .tb-model { background: #f778ba; }
+    .theme-default .tb-dir { background: #58a6ff; }
+    .theme-default .tb-ctx { background: #3fb950; }
+
+    .theme-ocean .tb-model { background: #39d2c0; }
+    .theme-ocean .tb-dir { background: #58a6ff; }
+    .theme-ocean .tb-ctx { background: #3fb950; }
+
+    .theme-monokai .tb-model { background: #d29922; }
+    .theme-monokai .tb-dir { background: #39d2c0; }
+    .theme-monokai .tb-ctx { background: #3fb950; }
+
+    .theme-minimal .tb-model { background: #8b949e; }
+    .theme-minimal .tb-dir { background: #8b949e; }
+    .theme-minimal .tb-ctx { background: #3fb950; }
+
+    .theme-neon .tb-model { background: #f778ba; }
+    .theme-neon .tb-dir { background: #39d2c0; }
+    .theme-neon .tb-ctx { background: #3fb950; }
+
+    .theme-forest .tb-model { background: #3fb950; }
+    .theme-forest .tb-dir { background: #d29922; }
+    .theme-forest .tb-ctx { background: #3fb950; }
+
+    .theme-nord .tb-model { background: #58a6ff; }
+    .theme-nord .tb-dir { background: #39d2c0; }
+    .theme-nord .tb-ctx { background: #3fb950; }
+
+    .theme-lavender .tb-model { background: #bc8cff; }
+    .theme-lavender .tb-dir { background: #39d2c0; }
+    .theme-lavender .tb-ctx { background: #3fb950; }
+
+    .theme-gruvbox .tb-model { background: #d29922; }
+    .theme-gruvbox .tb-dir { background: #3fb950; }
+    .theme-gruvbox .tb-ctx { background: #3fb950; }
+
+    .theme-sakura .tb-model { background: #f778ba; }
+    .theme-sakura .tb-dir { background: #39d2c0; }
+    .theme-sakura .tb-ctx { background: #3fb950; }
+
+    .theme-swatch .desc { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
+
+    /* Field table */
+    .field-table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem;
+    }
+    .field-table th, .field-table td {
+      padding: 10px 16px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .field-table th { font-weight: 600; color: var(--text-secondary); }
+    .field-table td { font-family: 'SF Mono', 'Fira Code', monospace; }
+    .field-table .color-dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px;
+      vertical-align: middle;
+    }
+    .dot-magenta { background: var(--accent-magenta); }
+    .dot-blue { background: var(--accent-blue); }
+    .dot-green { background: var(--accent-green); }
+    .dot-yellow { background: var(--accent-yellow); }
+    .dot-red { background: var(--accent-red); }
+    .dot-cyan { background: var(--accent-cyan); }
+    .dot-gray { background: var(--text-secondary); }
+
+    /* Color thresholds */
+    .thresholds { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .threshold {
+      flex: 1; min-width: 120px; padding: 12px 16px; border-radius: 8px;
+      text-align: center; font-size: 0.85rem;
+    }
+    .threshold-green { background: rgba(63, 185, 80, 0.15); border: 1px solid rgba(63, 185, 80, 0.3); }
+    .threshold-yellow { background: rgba(210, 153, 34, 0.15); border: 1px solid rgba(210, 153, 34, 0.3); }
+    .threshold-red { background: rgba(248, 81, 73, 0.15); border: 1px solid rgba(248, 81, 73, 0.3); }
+    .threshold .pct { font-size: 1.2rem; font-weight: 700; }
+    .threshold-green .pct { color: var(--accent-green); }
+    .threshold-yellow .pct { color: var(--accent-yellow); }
+    .threshold-red .pct { color: var(--accent-red); }
+    .threshold .label { color: var(--text-secondary); margin-top: 4px; }
+    .threshold .action { font-size: 0.8rem; margin-top: 4px; }
+
+    /* Install */
+    .install-steps {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .install-step {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px;
+    }
+    .install-step .step-num {
+      display: inline-block; width: 28px; height: 28px; line-height: 28px;
+      text-align: center; border-radius: 50%;
+      background: var(--accent-cyan); color: var(--bg-primary);
+      font-weight: 700; font-size: 0.85rem; margin-bottom: 8px;
+    }
+    .install-step h3 { font-size: 1rem; margin-bottom: 6px; }
+    .install-step p { font-size: 0.9rem; color: var(--text-secondary); }
+    .install-step code {
+      display: block; margin-top: 8px; padding: 8px 12px;
+      background: var(--bg-primary); border-radius: 4px;
+      font-size: 0.8rem; font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* Config CLI */
+    .cli-demo {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px; margin-top: 16px;
+    }
+    .cli-cmd {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 16px;
+    }
+    .cli-cmd .cmd { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent-cyan); }
+    .cli-cmd .desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+
+    /* How it works */
+    .flow-diagram {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 24px; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem; line-height: 1.8; white-space: pre; overflow-x: auto;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 32px 0; border-top: 1px solid var(--border);
+      color: var(--text-secondary); font-size: 0.85rem;
+    }
+    footer a { color: var(--accent-blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.8rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .themes-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Screenshots */
+    .screenshots {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0;
+    }
+    .screenshots img { width: 100%; border-radius: 6px; border: 1px solid var(--border); }
+    .screenshots figcaption { text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+    .screenshot-wide { margin: 12px 0; }
+    .screenshot-wide img { width: 100%; border-radius: 6px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">⌘ claude-code-statusline</span>
+  <span class="lang-switch"><a href="README.en.md">English</a></span>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>Claude Code Status Line</h1>
+    <p>为 Claude Code 打造的情境感知状态栏——模型、目录、上下文、推理模式，一眼尽览。</p>
+    <div class="badges">
+      <span class="badge badge-version">v2.0</span>
+      <span class="badge badge-mit">MIT License</span>
+      <span class="badge badge-mit">10 Themes</span>
+      <span class="badge badge-mit">8 Fields</span>
+    </div>
+    <div class="demo-bar">
+      <span class="model">DeepSeek-V4-flash</span>
+      <span class="sep"> &nbsp;|&nbsp; </span>
+      <span class="dir">src/components</span>
+      <span class="sep"> &nbsp;|&nbsp; </span>
+      <span class="ctx">43% (86k/200k)</span>
+      <span class="sep"> &nbsp;|&nbsp; </span>
+      <span class="think">think</span>
+      <span class="sep"> &nbsp;|&nbsp; </span>
+      <span class="effort">high</span>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">📸</span> 效果预览</h2>
+    <div class="screenshots">
+      <figure>
+        <img src="screenshots/statusbar-normal.png" alt="正常模式">
+        <figcaption>🟢 正常模式 &lt; 50%</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/statusbar-warning.png" alt="偏高模式">
+        <figcaption>🟡 较高占用 50-80%</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/statusbar-agent.png" alt="Agent模式">
+        <figcaption>🔴 危险占用 &gt; 80%</figcaption>
+      </figure>
+    </div>
+    <div class="screenshot-wide">
+      <figure>
+        <img src="screenshots/statusbar-simulator.png" alt="完整界面">
+        <figcaption>完整界面示意（模拟器）</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">✨</span> 功能特性</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">⚡</div>
+        <h3>实时更新</h3>
+        <p>每次 AI 回复后自动刷新，无需手动触发，零操作感知。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📏</div>
+        <h3>单行显示</h3>
+        <p>紧凑设计，不干扰主工作区，信息一目了然。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🧠</div>
+        <h3>模型与推理</h3>
+        <p>显示当前 AI 模型名，深度思考时自动出现 think 标识。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📂</div>
+        <h3>智能目录</h3>
+        <p>路径智能缩短（保留最后 2 级），~ 代替 Home 目录。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📊</div>
+        <h3>上下文监控</h3>
+        <p>实时占用百分比 + 精确 token 用量，颜色预警一目了然。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎨</div>
+        <h3>多主题支持</h3>
+        <p>内置 10 套配色主题，自由切换，适配不同终端审美。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔧</div>
+        <h3>字段开关</h3>
+        <p>每个字段独立开关，只显示你关心的信息。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">⏱️</div>
+        <h3>会话时长</h3>
+        <p>记录会话已用时长，帮你判断是否需要清理上下文。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fields -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">📊</span> 字段说明</h2>
+    <table class="field-table">
+      <thead>
+        <tr><th>字段</th><th>含义</th><th>颜色</th><th>示例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Model</td><td>当前 AI 模型</td><td><span class="color-dot dot-magenta"></span>品红加粗</td><td>DeepSeek-V4-flash</td></tr>
+        <tr><td>Directory</td><td>当前工作目录</td><td><span class="color-dot dot-blue"></span>蓝色</td><td>src/components</td></tr>
+        <tr><td>Context</td><td>占用百分比 + token</td><td><span class="color-dot dot-green"></span>绿/黄/红</td><td>43% (86k/200k)</td></tr>
+        <tr><td>think</td><td>深度思考模式</td><td><span class="color-dot dot-gray"></span>灰色斜体</td><td>think</td></tr>
+        <tr><td>Agent</td><td>Agent 子进程名称</td><td><span class="color-dot dot-yellow"></span>黄色</td><td>explore</td></tr>
+        <tr><td>effort</td><td>专注模式级别</td><td><span class="color-dot dot-cyan"></span>青色</td><td>high</td></tr>
+        <tr><td>fast</td><td>快速模式</td><td><span class="color-dot dot-cyan"></span>青色</td><td>fast</td></tr>
+        <tr><td>Duration</td><td>会话已用时间</td><td><span class="color-dot dot-cyan"></span>青色</td><td>12m30s</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px; font-size:1rem;">上下文颜色阈值</h3>
+    <div class="thresholds">
+      <div class="threshold threshold-green">
+        <div class="pct">&lt; 50%</div>
+        <div class="label">🟢 健康</div>
+        <div class="action">继续工作</div>
+      </div>
+      <div class="threshold threshold-yellow">
+        <div class="pct">50% – 80%</div>
+        <div class="label">🟡 注意</div>
+        <div class="action">考虑精简上下文</div>
+      </div>
+      <div class="threshold threshold-red">
+        <div class="pct">&gt; 80%</div>
+        <div class="label">🔴 危险</div>
+        <div class="action">建议开启新会话</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Themes -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">🎨</span> 配色主题</h2>
+    <p style="color:var(--text-secondary); margin-bottom:20px;">内置 10 套主题，一键切换，适配不同终端审美。</p>
+        <div class="themes-grid">
+      <div class="theme-swatch theme-default">
+        <div class="name">default</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">品红 / 蓝 / 绿（原版）</div>
+      </div>
+      <div class="theme-swatch theme-ocean">
+        <div class="name">ocean</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">冷色系：青 / 蓝调</div>
+      </div>
+      <div class="theme-swatch theme-monokai">
+        <div class="name">monokai</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">Monokai 暖色调</div>
+      </div>
+      <div class="theme-swatch theme-minimal">
+        <div class="name">minimal</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">低对比度简洁版</div>
+      </div>
+      <div class="theme-swatch theme-neon">
+        <div class="name">neon</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">霓虹亮色</div>
+      </div>
+      <div class="theme-swatch theme-forest">
+        <div class="name">forest</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">自然森系：绿 / 琥珀</div>
+      </div>
+      <div class="theme-swatch theme-nord">
+        <div class="name">nord</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">北极蓝灰：清爽干净</div>
+      </div>
+      <div class="theme-swatch theme-lavender">
+        <div class="name">lavender</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">淡紫优雅：柔和护眼</div>
+      </div>
+      <div class="theme-swatch theme-gruvbox">
+        <div class="name">gruvbox</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">复古暖调：经典配色</div>
+      </div>
+      <div class="theme-swatch theme-sakura">
+        <div class="name">sakura</div>
+        <div class="theme-bar"><span class="tb-model"></span><span class="tb-dir"></span><span class="tb-ctx"></span></div>
+        <div class="desc">樱花粉调：精致可爱</div>
+      </div>
+    </div>
+
+<!-- Install -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">🚀</span> 快速安装</h2>
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="step-num">1</div>
+        <h3>前置依赖</h3>
+        <p>安装 jq（JSON 解析器）</p>
+        <code>brew install jq</code>
+      </div>
+      <div class="install-step">
+        <div class="step-num">2</div>
+        <h3>一键安装</h3>
+        <p>下载并运行安装脚本</p>
+        <code>bash -c "$(curl -fsSL https://raw.githubusercontent.com/tsingke/claude-code-statusline/main/scripts/install.sh)"</code>
+      </div>
+      <div class="install-step">
+        <div class="step-num">3</div>
+        <h3>重启生效</h3>
+        <p>重启 Claude Code 即可看到状态栏</p>
+        <code>claude</code>
+      </div>
+    </div>
+
+    <h3 style="font-size:1rem; margin-bottom:12px;">安装脚本自动完成：</h3>
+    <ul style="color:var(--text-secondary); font-size:0.9rem; list-style: none;">
+      <li style="margin-bottom:6px;">✅ 复制 <code>statusline.sh</code> → <code>~/.claude/statusline.sh</code></li>
+      <li style="margin-bottom:6px;">✅ 复制 <code>statusline-config.sh</code> → <code>~/.claude/</code>（配置 CLI）</li>
+      <li style="margin-bottom:6px;">✅ 注册 SKILL.md 为 Claude Code 技能</li>
+      <li style="margin-bottom:6px;">✅ 添加 statusLine 配置到 <code>settings.json</code></li>
+      <li style="margin-bottom:6px;">✅ 创建默认配置文件</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Configuration -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">⚙️</span> 配置文件 CLI</h2>
+    <p style="color:var(--text-secondary); margin-bottom:16px;">安装后通过 <code>~/.claude/statusline-config.sh</code> 进行配置，或设置别名简化操作。</p>
+
+    <div class="cli-demo">
+      <div class="cli-cmd">
+        <div class="cmd">statusline theme</div>
+        <div class="desc">列出可用主题</div>
+      </div>
+      <div class="cli-cmd">
+        <div class="cmd">statusline theme ocean</div>
+        <div class="desc">切换到 ocean 主题</div>
+      </div>
+      <div class="cli-cmd">
+        <div class="cmd">statusline separator '•'</div>
+        <div class="desc">修改字段分隔符</div>
+      </div>
+      <div class="cli-cmd">
+        <div class="cmd">statusline show +fast</div>
+        <div class="desc">添加 fast 字段</div>
+      </div>
+      <div class="cli-cmd">
+        <div class="cmd">statusline show -duration</div>
+        <div class="desc">移除 duration 字段</div>
+      </div>
+      <div class="cli-cmd">
+        <div class="cmd">statusline status</div>
+        <div class="desc">查看当前配置</div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px; font-size:0.9rem; color:var(--text-secondary);">
+      推荐添加别名：<code style="background:var(--bg-card); padding:2px 8px; border-radius:4px;">alias statusline='~/.claude/statusline-config.sh'</code>
+    </p>
+  </div>
+</section>
+
+<!-- How it works -->
+<section>
+  <div class="container">
+    <h2><span class="emoji">🔧</span> 实现原理</h2>
+    <p style="color:var(--text-secondary); margin-bottom:16px;">
+      Claude Code 内置的 <code>statusLine</code> 配置项允许指定一个 shell 脚本，该脚本在每次 AI 回复后自动执行，并通过 <strong>stdin</strong> 接收完整会话状态 JSON。脚本输出到 <strong>stdout</strong> 的内容将显示在终端底部。
+    </p>
+    <div class="flow-diagram">Claude Code 完成响应
+         │
+         ▼
+构建会话状态 JSON (模型, 目录, 上下文, 耗时...)
+         │
+  stdin  ▼
+┌──────────────────────────┐
+│     statusline.sh        │  ← jq 解析 JSON, 脚本格式化 + 着色
+└──────────────────────────┘
+         │
+  stdout ▼
+   终端底部状态栏</div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>
+      <a href="https://github.com/tsingke/claude-code-statusline">GitHub</a> •
+      <a href="README.md">中文文档</a> •
+      <a href="README.en.md">English Docs</a> •
+      <a href="https://github.com/tsingke/claude-code-statusline/blob/main/LICENSE">MIT License</a>
+    </p>
+    <p style="margin-top:8px;">Built for the Claude Code community</p>
+  </div>
+</footer>
+
+</body>
+</html>

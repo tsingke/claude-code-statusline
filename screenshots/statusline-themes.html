@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Statusline 主题配色对比</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1b26;
+    color: #c0caf5;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace;
+    padding: 40px;
+  }
+  h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #e0e0e0;
+  }
+  .subtitle {
+    color: #888;
+    margin-bottom: 36px;
+    font-size: 14px;
+  }
+  .theme-group {
+    margin-bottom: 32px;
+    background: #12131e;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #2a2b3e;
+  }
+  .theme-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    border-bottom: 1px solid #2a2b3e;
+    gap: 16px;
+  }
+  .theme-name {
+    font-size: 18px;
+    font-weight: 700;
+    min-width: 100px;
+  }
+  .theme-desc {
+    color: #888;
+    font-size: 13px;
+  }
+  .statusline-preview {
+    padding: 18px 24px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    letter-spacing: 0.3px;
+  }
+  .statusline-preview .sep {
+    margin: 0 10px;
+    color: #555;
+  }
+  .legend {
+    padding: 12px 24px 16px;
+    border-top: 1px solid #1e1f32;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .monokai-bg { background: #272822; }
+  .neon-bg { background: #0a0a14; }
+  .ocean-bg { background: #0e1a2b; }
+  .minimal-bg { background: #1c1c1e; }
+  .default-bg { background: #12131e; }
+  .context-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Claude Code Statusline 主题配色</h1>
+<p class="subtitle">5 种主题在深色终端下的视觉效果对比 &nbsp;·&nbsp; 模拟状态栏预览</p>
+
+<!-- ===== DEFAULT ===== -->
+<div class="theme-group">
+  <div class="theme-header">
+    <span class="theme-name" style="color:#cd00cd;">default</span>
+    <span class="theme-desc">Original — Magenta model, blue dir, green/yellow/red context</span>
+  </div>
+  <div class="statusline-preview default-bg">
+    <span style="color:#cd00cd;font-weight:700;">DeepSeek-V4-flash</span>
+    <span class="sep">|</span>
+    <span style="color:#0000ee;">Workspace/projects</span>
+    <span class="sep">|</span>
+    <span style="color:#00cd00;">43% (86k/200k)</span>
+    <span class="sep">|</span>
+    <span style="color:#666;font-style:italic;">think</span>
+    <span class="sep">|</span>
+    <span style="color:#00cdcd;">high</span>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-swatch" style="background:#cd00cd;"></span> Model (bold magenta)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#0000ee;"></span> Dir (blue)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00cd00;"></span> Context &lt;50% (green)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#cdcd00;"></span> Context 50-80% (yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff0000;"></span> Context &gt;80% (red)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#666;border-color:#666;"></span> Think (dim italic)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00cdcd;"></span> Effort (cyan)</span>
+  </div>
+</div>
+
+<!-- ===== OCEAN ===== -->
+<div class="theme-group">
+  <div class="theme-header" style="background:#0e1a2b;border-color:#1a3050;">
+    <span class="theme-name" style="color:#00ced1;">ocean</span>
+    <span class="theme-desc">Cool blue/cyan tones — 清爽海洋风</span>
+  </div>
+  <div class="statusline-preview ocean-bg">
+    <span style="color:#00ced1;font-weight:700;">DeepSeek-V4-flash</span>
+    <span class="sep">|</span>
+    <span style="color:#4488ff;">Workspace/projects</span>
+    <span class="sep">|</span>
+    <span style="color:#00cd00;">43% (86k/200k)</span>
+    <span class="sep">|</span>
+    <span style="color:#88bbdd;font-style:italic;">think</span>
+    <span class="sep">|</span>
+    <span style="color:#00ced1;">high</span>
+  </div>
+  <div class="legend" style="border-color:#1a3050;">
+    <span class="legend-item"><span class="legend-swatch" style="background:#00ced1;"></span> Model (bold cyan)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#4488ff;"></span> Dir (blue)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00cd00;"></span> Context &lt;50% (green)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#cdcd00;"></span> Context 50-80% (yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff0000;"></span> Context &gt;80% (red)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#88bbdd;border-color:#88bbdd;"></span> Think (dim italic)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00ced1;"></span> Effort (cyan)</span>
+  </div>
+</div>
+
+<!-- ===== MONOKAI ===== -->
+<div class="theme-group">
+  <div class="theme-header" style="background:#272822;border-color:#3e3d32;">
+    <span class="theme-name" style="color:#e6db74;">monokai</span>
+    <span class="theme-desc" style="color:#aaa;">Monokai-inspired warm palette — 经典编辑器配色</span>
+  </div>
+  <div class="statusline-preview" style="background:#272822;">
+    <span style="color:#e6db74;font-weight:700;">DeepSeek-V4-flash</span>
+    <span class="sep" style="color:#666;">|</span>
+    <span style="color:#66d9ef;">Workspace/projects</span>
+    <span class="sep" style="color:#666;">|</span>
+    <span style="color:#a6e22e;">43% (86k/200k)</span>
+    <span class="sep" style="color:#666;">|</span>
+    <span style="color:#888;font-style:italic;">think</span>
+    <span class="sep" style="color:#666;">|</span>
+    <span style="color:#fd5ff0;">high</span>
+  </div>
+  <div class="legend" style="border-color:#3e3d32;">
+    <span class="legend-item"><span class="legend-swatch" style="background:#e6db74;"></span> Model (bold yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#66d9ef;"></span> Dir (cyan)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#a6e22e;"></span> Context &lt;50% (green)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#e6db74;"></span> Context 50-80% (yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#f92672;"></span> Context &gt;80% (red)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#888;border-color:#888;"></span> Think (dim italic)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#fd5ff0;"></span> Effort (magenta)</span>
+  </div>
+</div>
+
+<!-- ===== MINIMAL ===== -->
+<div class="theme-group">
+  <div class="theme-header" style="background:#1c1c1e;border-color:#333;">
+    <span class="theme-name" style="color:#e5e5e5;">minimal</span>
+    <span class="theme-desc" style="color:#999;">Low contrast, clean and unobtrusive — 低对比度简洁风</span>
+  </div>
+  <div class="statusline-preview" style="background:#1c1c1e;">
+    <span style="color:#ffffff;font-weight:700;">DeepSeek-V4-flash</span>
+    <span class="sep" style="color:#444;">|</span>
+    <span style="color:#cccccc;">Workspace/projects</span>
+    <span class="sep" style="color:#444;">|</span>
+    <span style="color:#66ff66;">43% (86k/200k)</span>
+    <span class="sep" style="color:#444;">|</span>
+    <span style="color:#999;font-style:italic;">think</span>
+    <span class="sep" style="color:#444;">|</span>
+    <span style="color:#cccccc;">high</span>
+  </div>
+  <div class="legend" style="border-color:#333;">
+    <span class="legend-item"><span class="legend-swatch" style="background:#fff;"></span> Model (bold white)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ccc;"></span> Dir (white)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#66ff66;"></span> Context &lt;50% (bright green)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ffff66;"></span> Context 50-80% (bright yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff6666;"></span> Context &gt;80% (bright red)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#999;border-color:#999;"></span> Think (dim white)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ccc;"></span> Effort (white)</span>
+  </div>
+</div>
+
+<!-- ===== NEON ===== -->
+<div class="theme-group">
+  <div class="theme-header" style="background:#0a0a14;border-color:#2a1a3e;">
+    <span class="theme-name" style="color:#ff00ff;">neon</span>
+    <span class="theme-desc" style="color:#aaa;">Bright neon colors for dark terminals — 霓虹炫彩风</span>
+  </div>
+  <div class="statusline-preview" style="background:#0a0a14;">
+    <span style="color:#ff00ff;font-weight:700;">DeepSeek-V4-flash</span>
+    <span class="sep" style="color:#555;">|</span>
+    <span style="color:#00ffff;">Workspace/projects</span>
+    <span class="sep" style="color:#555;">|</span>
+    <span style="color:#00ff00;">43% (86k/200k)</span>
+    <span class="sep" style="color:#555;">|</span>
+    <span style="color:#ff66cc;font-style:italic;">think</span>
+    <span class="sep" style="color:#555;">|</span>
+    <span style="color:#00ffff;">high</span>
+  </div>
+  <div class="legend" style="border-color:#2a1a3e;">
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff00ff;"></span> Model (bold magenta)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00ffff;"></span> Dir (cyan)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00ff00;"></span> Context &lt;50% (bright green)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ffff00;"></span> Context 50-80% (bright yellow)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff0000;"></span> Context &gt;80% (bright red)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#ff66cc;border-color:#ff66cc;"></span> Think (dim magenta italic)</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#00ffff;"></span> Effort (bright cyan)</span>
+  </div>
+</div>
+
+</body>
+</html>
